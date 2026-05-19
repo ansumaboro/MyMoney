@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "MyMoneyAI",
+    "slug": "mymoneyai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "807c0074-d283-4385-bffe-5761f2caaafb"
+      }
+    }
+  }
+}
