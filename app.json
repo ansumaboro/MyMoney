@@ -2,6 +2,7 @@
   "expo": {
     "name": "MyMoneyAI",
     "slug": "mymoneyai",
+    "scheme": "mymoneyai",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -16,6 +17,14 @@
       "eas": {
         "projectId": "807c0074-d283-4385-bffe-5761f2caaafb"
       }
-    }
+    },
+    "android": {
+      "package": "com.ansuma_boro.mymoneyai"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-sqlite"
+    ]
   }
 }
