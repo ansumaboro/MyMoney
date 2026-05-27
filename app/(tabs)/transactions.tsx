@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, FlatList, Pressable, Alert } from "react-native";
+import { Text, View, StyleSheet, FlatList, Pressable, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { useTransactions } from "../../context/TransactionContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -12,11 +12,11 @@ export default function About() {
             [
                 {
                     text: "Cancel",
-                    onPress: () => {},
+                    onPress: () => { },
                 },
                 {
                     text: "Delete",
-                    onPress: () => {removeTransaction(id)}
+                    onPress: () => { removeTransaction(id) }
                 }
             ],
             { cancelable: true }
@@ -25,28 +25,33 @@ export default function About() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Text style={styles.sectionTitle}>Recent Transactions</Text>
-            <FlatList
-                data={transactions}
-                keyExtractor={(item) => item.id.toString()}
-                contentContainerStyle={styles.listContent}
-                renderItem={({ item }) => (
-                    <View style={styles.transactionRow}>
-                        <View style={styles.transactionDetails}>
-                            <Text style={styles.transactionTitle}>{item.title}</Text>
-                            <Text style={styles.transactionMeta}>
-                                {item.category} | {item.createdAt}
-                            </Text>
+            <KeyboardAvoidingView
+                style={styles.container}
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+            >
+                <Text style={styles.heading}>Recent Transactions</Text>
+                <FlatList
+                    data={transactions}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={styles.listContent}
+                    renderItem={({ item }) => (
+                        <View style={styles.transactionRow}>
+                            <View style={styles.transactionDetails}>
+                                <Text style={styles.transactionTitle}>{item.title}</Text>
+                                <Text style={styles.transactionMeta}>
+                                    {item.category} | {item.createdAt}
+                                </Text>
+                            </View>
+                            <View style={styles.transactionActions}>
+                                <Text style={styles.transactionAmount}>- ₹{item.amount.toFixed(2)}</Text>
+                                <Pressable onPress={() => handleRemoveTransaction(item.id)}>
+                                    <Text style={styles.deleteText}>Delete</Text>
+                                </Pressable>
+                            </View>
                         </View>
-                        <View style={styles.transactionActions}>
-                            <Text style={styles.transactionAmount}>- ₹{item.amount.toFixed(2)}</Text>
-                            <Pressable onPress={() => handleRemoveTransaction(item.id)}>
-                                <Text style={styles.deleteText}>Delete</Text>
-                            </Pressable>
-                        </View>
-                    </View>
-                )}
-            />
+                    )}
+                />
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
