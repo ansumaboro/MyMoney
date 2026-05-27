@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "MyMoneyAI",
-    "slug": "mymoneyai",
-    "scheme": "mymoneyai",
+    "name": "MyMoney",
+    "slug": "mymoney",
+    "scheme": "mymoney",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,7 @@
       }
     },
     "android": {
-      "package": "com.ansuma_boro.mymoneyai"
+      "package": "com.ansuma_boro.mymoney"
     },
     "plugins": [
       "expo-router",
