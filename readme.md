@@ -196,11 +196,12 @@ The application uses Expo SQLite for persistent offline data storage.
 
 The application uses Expo Router with tab-based navigation.
 
+```tsx
 <Tabs>
   <Tabs.Screen name="index" />
   <Tabs.Screen name="transactions" />
 </Tabs>
-
+```
 
 ---
 
