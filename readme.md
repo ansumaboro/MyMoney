@@ -222,7 +222,7 @@ Future improvements planned for the application:
 
 # Demo
 
-APK Download: https://tinyurl.com/55t59crb
+APK Download: https://tinyurl.com/bdewwr36
 
 ---
 
