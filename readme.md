@@ -55,10 +55,8 @@ A modern offline-first personal finance and expense tracking mobile application 
 
 # Screenshots
 
-```md
 ![Home Screen](./assets/screenshots/home.jpeg)
 ![Transaction Screen](./assets/screenshots/transactions.jpeg)
-```
 
 ---
 
