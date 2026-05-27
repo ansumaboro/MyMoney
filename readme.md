@@ -57,7 +57,7 @@ A modern offline-first personal finance and expense tracking mobile application 
 
 ## Screenshots
 
-<table border=0>
+<table border='0'>
   <tr>
     <td align="center">
       <img src="./assets/screenshots/home.jpeg" width="220"/>
