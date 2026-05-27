@@ -1,4 +1,4 @@
-# MyMoneyAI
+# MyMoney
 
 A modern offline-first personal finance and expense tracking mobile application built using React Native and Expo. The application helps users manage budgets, track expenses, analyze spending patterns, and securely store financial records locally using SQLite.
 
@@ -12,7 +12,6 @@ A modern offline-first personal finance and expense tracking mobile application 
 * Offline-first local storage using SQLite
 * Persistent transaction history
 * Bottom tab navigation using Expo Router
-* Cross-platform support (Android, iOS, Web)
 * Real-time expense updates using Context API
 * Responsive and modern mobile UI
 
