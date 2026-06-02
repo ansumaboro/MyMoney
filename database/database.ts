@@ -42,6 +42,16 @@ export async function removeTransactionDb(id: number) {
     await db.runAsync(`DELETE FROM transactions WHERE id = (?)`, [id]);
 }
 
+export async function getMonthTransactionsDb(createdDate: number) {
+    const db = await dbConnection;
+    const year = new Date(createdDate).getFullYear();
+    const month = new Date(createdDate).getMonth();
+    const monthStart = new Date(year, month).getTime();
+    const monthEnd = new Date(year, month+1, 1).getTime()-1;
+    const result: Transaction[] = await db.getAllAsync(`SELECT * FROM transactions WHERE createdAt BETWEEN (?) AND (?) ORDER BY createdAt DESC`, [monthStart, monthEnd]);
+    return result;
+}
+
 export async function getAllTransactionsDb() {
     const db = await dbConnection;
     const result: Transaction[] = await db.getAllAsync(`SELECT * FROM transactions ORDER BY createdAt DESC`);
@@ -60,7 +70,7 @@ export async function getMonthlyBudget(createdDate: number) {
 
     let monthlyBudget=0;
     for (const row of allRow) {
-        monthlyBudget += row.amount;        
+        monthlyBudget += row.amount;      
     }
     return monthlyBudget;
 }

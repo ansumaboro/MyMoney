@@ -1,9 +1,15 @@
-import { Text, View, StyleSheet, FlatList, Pressable, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import { Text, View, StyleSheet, FlatList, Pressable, Alert, KeyboardAvoidingView, Platform, SectionList } from "react-native";
 import { useTransactions } from "../../context/TransactionContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useEffect } from "react";
+import { Transaction } from "../../types/transaction";
 
-export default function About() {
-    const { transactions, removeTransaction } = useTransactions();
+export default function Transactions() {
+    // console.log("Render");
+    const { transactions, removeTransaction, allTransactions, loadAllTransactions, sections } = useTransactions();
+    useEffect(() => {
+        loadAllTransactions();
+    }, [])
 
     const handleRemoveTransaction = (id: number) => {
         Alert.alert(
@@ -29,33 +35,50 @@ export default function About() {
                 style={styles.container}
                 behavior={Platform.OS === "ios" ? "padding" : undefined}
             >
-                <Text style={styles.heading}>Recent Transactions</Text>
-                <FlatList
-                    data={transactions}
+                <Text style={styles.heading}>Transaction History</Text>
+                <SectionList
+                    sections={sections}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContent}
                     renderItem={({ item }) => (
-                        <View style={styles.transactionRow}>
-                            <View style={styles.transactionDetails}>
-                                <Text style={styles.transactionTitle}>{item.title}</Text>
-                                <Text style={styles.transactionMeta}>
-                                    {item.category} | {item.createdAt}
-                                </Text>
-                            </View>
-                            <View style={styles.transactionActions}>
-                                <Text style={styles.transactionAmount}>- ₹{item.amount.toFixed(2)}</Text>
-                                <Pressable onPress={() => handleRemoveTransaction(item.id)}>
-                                    <Text style={styles.deleteText}>Delete</Text>
-                                </Pressable>
-                            </View>
+                        <TransactionCard item={item} handleRemoveTransaction={handleRemoveTransaction} />
+                    )}
+                    renderSectionHeader={({ section }) => (
+                        <View style={styles.monthHeader}>
+                            <Text style={styles.monthHeaderText}>
+                                {section.title}
+                            </Text>
                         </View>
                     )}
+                    ListEmptyComponent={
+                        <View>
+                            <Text style={styles.emptyText}>No transactions recorded.</Text>
+                        </View>
+                    }
                 />
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
 
+function TransactionCard({ item, handleRemoveTransaction }: { item: Transaction, handleRemoveTransaction: (id: number) => void }) {
+    return (
+        <View style={styles.transactionRow}>
+            <View style={styles.transactionDetails}>
+                <Text style={styles.transactionTitle}>{item.title}</Text>
+                <Text style={styles.transactionMeta}>
+                    {item.category} | {new Date(item.createdAt).toLocaleDateString()}
+                </Text>
+            </View>
+            <View style={styles.transactionActions}>
+                <Text style={styles.transactionAmount}> ₹{item.amount.toFixed(2)}</Text>
+                <Pressable onPress={() => handleRemoveTransaction(item.id)}>
+                    <Text style={styles.deleteText}>Delete</Text>
+                </Pressable>
+            </View>
+        </View>
+    )
+}
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -191,6 +214,15 @@ const styles = StyleSheet.create({
     listContent: {
         paddingBottom: 24,
     },
+    monthHeader: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        paddingVertical: 8,
+        // paddingHorizontal: 8,
+    },
+    monthHeaderText: {
+        fontWeight: 500,
+    },
     transactionRow: {
         flexDirection: "row",
         alignItems: "center",
@@ -226,5 +258,11 @@ const styles = StyleSheet.create({
         color: "#2563eb",
         fontSize: 12,
         fontWeight: "600",
+    },
+    emptyText: {
+        textAlign: "center",
+        marginTop: 40,
+        fontSize: 16,
+        color: "#888",
     },
 });
