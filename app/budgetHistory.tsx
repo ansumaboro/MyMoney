@@ -1,19 +1,23 @@
-import { Text, View, StyleSheet, FlatList, Pressable, Alert, KeyboardAvoidingView, Platform, SectionList } from "react-native";
-import { useTransactions } from "../../context/TransactionContext";
+import { Text, View, StyleSheet, Pressable, Alert, KeyboardAvoidingView, Platform, SectionList, Modal, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useEffect } from "react";
-import { Transaction } from "../../types/transaction";
+import { useEffect, useState } from "react";
+import { useBudget } from "../context/BudgetContext";
+import { Budget } from "../types/budget";
 
-export default function Transactions() {
-    const { transactions, removeTransaction, allTransactions, loadAllTransactions, sections } = useTransactions();
+export default function Budgets() {
+    const { loadAllBudget, budgetSection, removeBudgetEntry } = useBudget();
+    const [modalVisible, setModalVisible] = useState(false);
     useEffect(() => {
-        loadAllTransactions();
+        loadAllBudget();
     }, [])
+    const [budgetType, setBudgetType] = useState<"in"|"out">("in");
+    const [title, setTitle] = useState("");
+    const [amount, setAmount] = useState("")
 
-    const handleRemoveTransaction = (id: number) => {
+    const handleRemoveBudget = (id: number) => {
         Alert.alert(
-            "Delete Transaction",
-            "Are you sure you want to delete this transaction?",
+            "Delete Budget Entry",
+            "Are you sure you want to delete this budget entry?",
             [
                 {
                     text: "Cancel",
@@ -21,7 +25,7 @@ export default function Transactions() {
                 },
                 {
                     text: "Delete",
-                    onPress: () => { removeTransaction(id) }
+                    onPress: () => { removeBudgetEntry(id) }
                 }
             ],
             { cancelable: true }
@@ -34,20 +38,21 @@ export default function Transactions() {
                 style={styles.container}
                 behavior={Platform.OS === "ios" ? "padding" : undefined}
             >
-                <Text style={styles.heading}>Transaction History</Text>
+                <Text style={styles.heading}>Budget History</Text>
                 <SectionList
-                    sections={sections}
+                    sections={budgetSection}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContent}
                     renderItem={({ item }) => (
-                        <TransactionCard item={item} handleRemoveTransaction={handleRemoveTransaction} />
+                        <TransactionCard item={item} handleRemoveBudget={handleRemoveBudget} />
+                        // <Text>{item.amount}</Text>
                     )}
                     renderSectionHeader={({ section }) => (
                         <View style={styles.monthHeader}>
                             <Text style={styles.monthHeaderText}>
                                 {section.title}
                             </Text>
-                            <Text style={styles.monthHeaderAmount}>
+                            <Text style={[styles.monthHeaderAmount, { color: section.total > 0 ? 'green' : '#dc2626' }]}>
                                 ₹{section.total.toFixed(2)}
                             </Text>
                         </View>
@@ -61,23 +66,72 @@ export default function Transactions() {
                         </View>
                     }
                 />
+                <View style={styles.buttonContainer}>
+                    <Pressable
+                        onPress={() => {setModalVisible(true); setBudgetType("in")}}
+                        style={({ pressed }) => [styles.updateButton, { backgroundColor: pressed ? "darkgreen" : "green" }]}
+                    >
+                        <Text style={styles.updateButtonText}>Add</Text>
+                    </Pressable>
+                    <Pressable
+                        onPress={() => {setModalVisible(true); setBudgetType("out")}}
+                        style={({ pressed }) => [styles.updateButton, { backgroundColor: pressed ? "#af1c1c" : "#dc2626" }]}
+                    >
+                        <Text style={styles.updateButtonText}>Less</Text>
+                    </Pressable>
+                </View>
+                {/* <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => setModalVisible(false)} // Handles Android back button
+                >
+                    <Pressable
+                        style={styles.overlay}
+                        onPress={() => setModalVisible(false)}
+                    >
+                        <Pressable style={styles.modalContainer} onPress={(e) => e.stopPropagation()}>
+                            <View>
+                                <Text style={styles.modalTitle}>Add Budget</Text>
+                                <TextInput
+                                    value={title}
+                                    onChangeText={setTitle}
+                                    placeholder="Budget title"
+                                    placeholderTextColor={"gray"}
+                                    style={styles.input}
+                                />
+                                <TextInput
+                                    value={amount}
+                                    onChangeText={setAmount}
+                                    keyboardType="numeric"
+                                    placeholder="Amount"
+                                    placeholderTextColor={"gray"}
+                                    style={styles.input}
+                                />
+                                <View style={styles.saveButton}>
+                                    <Text style={styles.saveButtonText}>Save</Text>
+                                </View>
+                            </View>
+                        </Pressable>
+                    </Pressable>
+                </Modal> */}
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
 
-function TransactionCard({ item, handleRemoveTransaction }: { item: Transaction, handleRemoveTransaction: (id: number) => void }) {
+function TransactionCard({ item, handleRemoveBudget }: { item: Budget, handleRemoveBudget: (id: number) => void }) {
     return (
         <View style={styles.transactionRow}>
             <View style={styles.transactionDetails}>
-                <Text style={styles.transactionTitle}>{item.title}</Text>
+                <Text style={styles.transactionTitle}>Budget</Text>
                 <Text style={styles.transactionMeta}>
-                    {item.category} | {new Date(item.createdAt).toLocaleDateString()}
+                    <Text style={{ color: item.amount > 0 ? 'green' : '#dc2626' }}>{item.amount > 0 ? "Add" : "Less"}</Text> | {new Date(item.createdAt).toLocaleDateString()}
                 </Text>
             </View>
             <View style={styles.transactionActions}>
-                <Text style={styles.transactionAmount}> ₹{item.amount.toFixed(2)}</Text>
-                <Pressable onPress={() => handleRemoveTransaction(item.id)}>
+                <Text style={[styles.transactionAmount, { color: item.amount > 0 ? 'green' : '#dc2626' }]}> ₹{item.amount < 0 ? (item.amount * (-1)).toFixed(2) : item.amount.toFixed(2)}</Text>
+                <Pressable onPress={() => handleRemoveBudget(item.id)}>
                     <Text style={styles.deleteText}>Delete</Text>
                 </Pressable>
             </View>
@@ -285,4 +339,60 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: "#888",
     },
+    buttonContainer: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        gap: 30,
+        paddingHorizontal: 12
+    },
+    updateButton: {
+        flex: 1,
+        height: 50,
+        borderRadius: 8,
+        justifyContent: "center"
+    },
+    updateButtonText: {
+        color: "white",
+        fontSize: 16,
+        fontWeight: 700,
+        textAlign: "center",
+    },
+    overlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent backdrop
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderRadius: 12,
+        padding: 24,
+        // alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5, // Shadow for Android
+    },
+    saveButton: {
+        backgroundColor: "#2888d6",
+        height: 45,
+        justifyContent: "center",
+        marginHorizontal: 8,
+        borderRadius: 8,
+    },
+    saveButtonText: {
+        color: "white",
+        fontSize: 18,
+        fontWeight: 600,
+        textAlign: "center"
+    },
+    modalTitle: {
+        color: "black",
+        fontSize: 24,
+        fontWeight: 700,
+        textAlign: "center",
+        marginBottom: 20,
+    }
 });

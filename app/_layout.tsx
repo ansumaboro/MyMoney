@@ -17,7 +17,10 @@ export default function RootLayout() {
         <BudgetProvider>
             <TransactionProvider>
                 <SafeAreaProvider>
-                    <Stack screenOptions={{ headerShown: false }} />
+                    <Stack screenOptions={{ headerShown: false }}>
+                        <Stack.Screen name="(tabs)" />
+                        <Stack.Screen name="budgetHistory" />
+                    </Stack>
                 </SafeAreaProvider>
             </TransactionProvider>
         </BudgetProvider>

@@ -9,19 +9,23 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTransactions } from "../../context/TransactionContext";
 import { Transaction, Category } from "../../types/transaction";
 import { useBudget } from "../../context/BudgetContext";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const categories: Category[] = ["Food", "Transport", "Shopping", "Bills", "Health", "Other"];
 
 export default function HomeScreen() {
-  const {monthlyBudget, increaseMonthlyBudget, decreaseMonthlyBudget} = useBudget();
+  const router = useRouter();
+  const { monthlyBudget, increaseMonthlyBudget, decreaseMonthlyBudget } = useBudget();
   const [budgetChange, setBudgetChange] = useState("");
-  const {transactions, addTransaction} = useTransactions();
+  const { transactions, addTransaction } = useTransactions();
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState<Category>("Food");
@@ -49,13 +53,13 @@ export default function HomeScreen() {
 
   const handleBudgetChange = (changeType: 1 | 0) => {
     const parsedBudgetChange = Number(budgetChange)
-    if (!parsedBudgetChange || parsedBudgetChange <= 0){
+    if (!parsedBudgetChange || parsedBudgetChange <= 0) {
       Alert.alert("Invalid amount", "Please enter a valid amount greater than 0.");
       return;
     }
-    if(changeType === 1){
+    if (changeType === 1) {
       increaseMonthlyBudget(parsedBudgetChange);
-    }else if (changeType === 0){
+    } else if (changeType === 0) {
       if (monthlyBudget < parsedBudgetChange) {
         Alert.alert("Invalid amount", "Cannot decrease amount less than your monthly budget.");
         return;
@@ -102,7 +106,14 @@ export default function HomeScreen() {
 
           <View style={styles.card}>
             <Text style={styles.label}>Monthly Budget</Text>
-            <SummaryBox label="Total Monthly Budget" value={monthlyBudget} color="gray" />
+            <Pressable
+              onPress={() => { router.push('/budgetHistory') }}
+              style={({pressed})=>[{backgroundColor: pressed?"#ececec": "white", borderRadius: 10}]}
+            >
+              {({pressed})=>(
+                <SummaryBox label="Total Monthly Budget" value={monthlyBudget} color={pressed?"black":"#868686"} history={true} />
+              )}
+            </Pressable>
             <View
               style={styles.row}
             >
@@ -113,30 +124,30 @@ export default function HomeScreen() {
                 placeholder="Amount"
                 placeholderTextColor={"gray"}
                 style={styles.input}
-                />
-                <Pressable
-                  style={[styles.budgetChangeButton, {backgroundColor: 'green'}]}
-                  onPress={() => {handleBudgetChange(1)}}
-                >
-                  <Text style={styles.budgetChangeText}>+</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.budgetChangeButton, {backgroundColor: '#f97316'}]}
-                  onPress={() => {handleBudgetChange(0)}}
-                >
-                  <Text style={styles.budgetChangeText}>-</Text>
-                </Pressable>
+              />
+              <Pressable
+                style={[styles.budgetChangeButton, { backgroundColor: 'green' }]}
+                onPress={() => { handleBudgetChange(1) }}
+              >
+                <Text style={styles.budgetChangeText}>+</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.budgetChangeButton, { backgroundColor: '#f97316' }]}
+                onPress={() => { handleBudgetChange(0) }}
+              >
+                <Text style={styles.budgetChangeText}>-</Text>
+              </Pressable>
             </View>
             <View style={styles.row}>
-              <SummaryBox label="Spent" value={spent} color="#f97316" />
               {
                 remaining >= 0 ?
-                <SummaryBox label="Remaining" value={remaining} color="#16a34a" />:
-                <SummaryBox label="Credit" value={remaining} color="#ff1515" />
+                  <SummaryBox label="Remaining" value={remaining} color="#16a34a" history={false} /> :
+                  <SummaryBox label="Credit" value={remaining} color="#ff1515" history={false} />
               }
+              <SummaryBox label="Spent" value={spent} color="#f97316" history={false} />
             </View>
             <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${progress}%`, backgroundColor: progress>100?"#f91616":"#2563eb" }]} />
+              <View style={[styles.progressFill, { width: `${progress}%`, backgroundColor: progress > 100 ? "#f91616" : "#2563eb" }]} />
             </View>
             <Text style={styles.progressText}>{progress.toFixed(1)}% of budget used</Text>
           </View>
@@ -192,16 +203,19 @@ export default function HomeScreen() {
           </View>
 
         </KeyboardAvoidingView>
-      </ScrollView>
-    </SafeAreaView>
+      </ScrollView >
+    </SafeAreaView >
   );
 }
 
-function SummaryBox({ label, value, color }: { label: string; value: number; color: string }) {
+function SummaryBox({ label, value, color, history }: { label: string; value: number; color: string; history: boolean }) {
   return (
     <View style={[styles.summaryBox, { borderColor: color }]}>
-      <Text style={styles.summaryLabel}>{label}</Text>
-      <Text style={[styles.summaryValue, { color }]}>₹{value.toFixed(2)}</Text>
+      <View style={{flex:1}}>
+        <Text style={styles.summaryLabel}>{label}</Text>
+        <Text style={[styles.summaryValue, { color }]}>₹{value.toFixed(2)}</Text>
+      </View>
+      {history && <Ionicons name="time-outline" style={styles.budgetHistory} />}
     </View>
   );
 }
@@ -232,6 +246,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
+  },
+  budgetHistory: {
+    fontSize: 24,
+    paddingHorizontal: 12,
   },
   label: {
     fontSize: 14,
@@ -265,11 +283,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   summaryBox: {
+    flexDirection: "row",
     flex: 1,
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
+    alignItems: "center",
   },
   summaryLabel: {
     fontSize: 12,
@@ -281,7 +301,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   progressTrack: {
-    // marginTop: 10,
     height: 10,
     borderRadius: 99,
     backgroundColor: "#e5e7eb",

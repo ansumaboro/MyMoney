@@ -1,11 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { Transaction, Category } from "../types/transaction";
+import { Transaction, Category, TransactionSection } from "../types/transaction";
 import { addTransactionDb, getMonthTransactionsDb, getAllTransactionsDb, removeTransactionDb } from "../database/database";
-
-type Section = {
-    title: string;
-    data: Transaction[];
-}
 
 type TransactionContextType = {
     transactions: Transaction[];
@@ -14,7 +9,7 @@ type TransactionContextType = {
     removeTransaction: (id: number) => void;
     allTransactions: Transaction[];
     loadAllTransactions: () => void;
-    sections: Section[];
+    sections: TransactionSection[];
 };
 
 const TransactionContext = createContext<TransactionContextType | null>(null);
@@ -22,7 +17,7 @@ const TransactionContext = createContext<TransactionContextType | null>(null);
 export function TransactionProvider({ children }: { children: ReactNode }) {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
-    const [sections, setSections] = useState<Section[]>([]);
+    const [sections, setSections] = useState<TransactionSection[]>([]);
     useEffect(() => {
         async function loadTransactions() {
             const initialTransactions: Transaction[] = await getMonthTransactionsDb(Date.now());
@@ -48,7 +43,11 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
         }, {} as Record<string, Transaction[]>);
 
         const tempSections = Object.entries(grouped).map(([title, data]) => (
-            { title, data }
+            { 
+                title,
+                data,
+                total: data.reduce((acc, tx) => (acc + tx.amount), 0),
+             }
         ))
         setSections(tempSections);
     }

@@ -1,11 +1,6 @@
 import * as SQLite from "expo-sqlite";
 import { Transaction } from "../types/transaction";
-
-type Budget = {
-    id: number;
-    amount: number;
-    createdAt: number;
-}
+import { Budget } from "../types/budget";
 
 export const dbConnection = SQLite.openDatabaseAsync("mymoney.db");
 
@@ -85,4 +80,17 @@ export async function decreaseBudget(newBudget: Budget) {
     const {id, amount, createdAt} = newBudget;
     const db = await dbConnection;
     await db.runAsync(`INSERT INTO budgets (id, amount, createdAt) VALUES (?, ?, ?)`, [id, amount, createdAt]);
+}
+
+export async function removeBudgetEntryDb(id:number) {
+    const db = await dbConnection;
+    const result: Budget[] = await db.getAllAsync(`SELECT * FROM budgets WHERE id = (?)`, [id]);
+    await db.runAsync(`DELETE FROM budgets WHERE id = (?)`, [id]);
+    return result[0];
+}
+
+export async function getAllBudgetsDb() {
+    const db = await dbConnection;
+    const result: Budget[] = await db.getAllAsync(`SELECT * FROM budgets ORDER BY createdAt DESC`);
+    return result;
 }
