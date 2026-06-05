@@ -14,8 +14,9 @@
       "**/*"
     ],
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "807c0074-d283-4385-bffe-5761f2caaafb"
+        "projectId": "0b134bd6-4e07-4e3b-8399-8ea1f400bcde"
       }
     },
     "android": {
@@ -25,6 +26,7 @@
       "expo-router",
       "expo-font",
       "expo-sqlite"
-    ]
+    ],
+    "owner": "ansuma_boro"
   }
 }
