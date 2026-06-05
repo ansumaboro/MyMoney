@@ -5,14 +5,34 @@ import { useBudget } from "../context/BudgetContext";
 import { Budget } from "../types/budget";
 
 export default function Budgets() {
-    const { loadAllBudget, budgetSection, removeBudgetEntry } = useBudget();
+    const { monthlyBudget, increaseMonthlyBudget, decreaseMonthlyBudget, loadAllBudget, budgetSection, removeBudgetEntry } = useBudget();
     const [modalVisible, setModalVisible] = useState(false);
     useEffect(() => {
         loadAllBudget();
     }, [])
-    const [budgetType, setBudgetType] = useState<"in"|"out">("in");
+    const [budgetType, setBudgetType] = useState<"in" | "out">("in");
     const [title, setTitle] = useState("");
-    const [amount, setAmount] = useState("")
+    const [amount, setAmount] = useState("");
+
+    const handleBudgetChange = () => {
+        const parsedAmount = Number(amount)
+        if (!title.trim()) {
+            Alert.alert("Missing title", "Please enter a transaction title.");
+            return;
+        }
+        if (!parsedAmount || parsedAmount <= 0) {
+            Alert.alert("Invalid amount", "Please enter a valid amount greater than 0.");
+            return;
+        }
+        if (budgetType === "in") {
+            increaseMonthlyBudget(title, parsedAmount);
+        } else if (budgetType === "out") {
+            decreaseMonthlyBudget(title, parsedAmount);
+        }
+        setTitle("");
+        setAmount("");
+        setModalVisible(false);
+    }
 
     const handleRemoveBudget = (id: number) => {
         Alert.alert(
@@ -45,7 +65,6 @@ export default function Budgets() {
                     contentContainerStyle={styles.listContent}
                     renderItem={({ item }) => (
                         <TransactionCard item={item} handleRemoveBudget={handleRemoveBudget} />
-                        // <Text>{item.amount}</Text>
                     )}
                     renderSectionHeader={({ section }) => (
                         <View style={styles.monthHeader}>
@@ -68,19 +87,19 @@ export default function Budgets() {
                 />
                 <View style={styles.buttonContainer}>
                     <Pressable
-                        onPress={() => {setModalVisible(true); setBudgetType("in")}}
+                        onPress={() => { setModalVisible(true); setBudgetType("in") }}
                         style={({ pressed }) => [styles.updateButton, { backgroundColor: pressed ? "darkgreen" : "green" }]}
                     >
                         <Text style={styles.updateButtonText}>Add</Text>
                     </Pressable>
                     <Pressable
-                        onPress={() => {setModalVisible(true); setBudgetType("out")}}
+                        onPress={() => { setModalVisible(true); setBudgetType("out") }}
                         style={({ pressed }) => [styles.updateButton, { backgroundColor: pressed ? "#af1c1c" : "#dc2626" }]}
                     >
                         <Text style={styles.updateButtonText}>Less</Text>
                     </Pressable>
                 </View>
-                {/* <Modal
+                <Modal
                     animationType="slide"
                     transparent={true}
                     visible={modalVisible}
@@ -92,7 +111,7 @@ export default function Budgets() {
                     >
                         <Pressable style={styles.modalContainer} onPress={(e) => e.stopPropagation()}>
                             <View>
-                                <Text style={styles.modalTitle}>Add Budget</Text>
+                                <Text style={styles.modalTitle}>{budgetType == "in" ? "Increase Budget" : "Decrease Budget"}</Text>
                                 <TextInput
                                     value={title}
                                     onChangeText={setTitle}
@@ -108,13 +127,24 @@ export default function Budgets() {
                                     placeholderTextColor={"gray"}
                                     style={styles.input}
                                 />
-                                <View style={styles.saveButton}>
-                                    <Text style={styles.saveButtonText}>Save</Text>
-                                </View>
+                                {budgetType === "in" ?
+                                    <Pressable
+                                        onPress={handleBudgetChange}
+                                        style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? "darkgreen" : "green" }]}
+                                    >
+                                        <Text style={styles.saveButtonText}>Save</Text>
+                                    </Pressable> :
+                                    <Pressable
+                                        onPress={handleBudgetChange}
+                                        style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? "#af1c1c" : "#dc2626" }]}
+                                    >
+                                        <Text style={styles.saveButtonText}>Save</Text>
+                                    </Pressable>
+                                }
                             </View>
                         </Pressable>
                     </Pressable>
-                </Modal> */}
+                </Modal>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );
@@ -124,7 +154,7 @@ function TransactionCard({ item, handleRemoveBudget }: { item: Budget, handleRem
     return (
         <View style={styles.transactionRow}>
             <View style={styles.transactionDetails}>
-                <Text style={styles.transactionTitle}>Budget</Text>
+                <Text style={styles.transactionTitle}>{item.title}</Text>
                 <Text style={styles.transactionMeta}>
                     <Text style={{ color: item.amount > 0 ? 'green' : '#dc2626' }}>{item.amount > 0 ? "Add" : "Less"}</Text> | {new Date(item.createdAt).toLocaleDateString()}
                 </Text>
@@ -376,7 +406,6 @@ const styles = StyleSheet.create({
         elevation: 5, // Shadow for Android
     },
     saveButton: {
-        backgroundColor: "#2888d6",
         height: 45,
         justifyContent: "center",
         marginHorizontal: 8,

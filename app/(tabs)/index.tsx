@@ -9,7 +9,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,8 +22,7 @@ const categories: Category[] = ["Food", "Transport", "Shopping", "Bills", "Healt
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { monthlyBudget, increaseMonthlyBudget, decreaseMonthlyBudget } = useBudget();
-  const [budgetChange, setBudgetChange] = useState("");
+  const { monthlyBudget } = useBudget();
   const { transactions, addTransaction } = useTransactions();
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
@@ -50,24 +48,6 @@ export default function HomeScreen() {
       byCategory: grouped,
     };
   }, [monthlyBudget, transactions]);
-
-  const handleBudgetChange = (changeType: 1 | 0) => {
-    const parsedBudgetChange = Number(budgetChange)
-    if (!parsedBudgetChange || parsedBudgetChange <= 0) {
-      Alert.alert("Invalid amount", "Please enter a valid amount greater than 0.");
-      return;
-    }
-    if (changeType === 1) {
-      increaseMonthlyBudget(parsedBudgetChange);
-    } else if (changeType === 0) {
-      if (monthlyBudget < parsedBudgetChange) {
-        Alert.alert("Invalid amount", "Cannot decrease amount less than your monthly budget.");
-        return;
-      }
-      decreaseMonthlyBudget(parsedBudgetChange);
-    }
-    setBudgetChange("");
-  }
 
   const handleAddTransaction = () => {
     const parsedAmount = Number(amount);
@@ -114,30 +94,7 @@ export default function HomeScreen() {
                 <SummaryBox label="Total Monthly Budget" value={monthlyBudget} color={pressed?"black":"#868686"} history={true} />
               )}
             </Pressable>
-            <View
-              style={styles.row}
-            >
-              <TextInput
-                value={budgetChange}
-                onChangeText={setBudgetChange}
-                keyboardType="numeric"
-                placeholder="Amount"
-                placeholderTextColor={"gray"}
-                style={styles.input}
-              />
-              <Pressable
-                style={[styles.budgetChangeButton, { backgroundColor: 'green' }]}
-                onPress={() => { handleBudgetChange(1) }}
-              >
-                <Text style={styles.budgetChangeText}>+</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.budgetChangeButton, { backgroundColor: '#f97316' }]}
-                onPress={() => { handleBudgetChange(0) }}
-              >
-                <Text style={styles.budgetChangeText}>-</Text>
-              </Pressable>
-            </View>
+            
             <View style={styles.row}>
               {
                 remaining >= 0 ?

@@ -4,8 +4,8 @@ import { Budget, BudgetSection } from "../types/budget";
 
 type BudgetContextType = {
     monthlyBudget: number;
-    increaseMonthlyBudget: (amount: number) => void;
-    decreaseMonthlyBudget: (amount: number) => void;
+    increaseMonthlyBudget: (title: string, amount: number) => void;
+    decreaseMonthlyBudget: (title: string, amount: number) => void;
     removeBudgetEntry: (id: number) => void;
     loadAllBudget: () => void;
     budgetSection: BudgetSection[];
@@ -28,6 +28,7 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
 
     const newBudget = {
         id: Date.now(),
+        title: "",
         amount: 0,
         createdAt: Date.now(),
     }
@@ -57,15 +58,17 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
         setBudgetSection(tempSections);
     }
 
-    const increaseMonthlyBudget = async (amount: number) => {
+    const increaseMonthlyBudget = async (title: string, amount: number) => {
         setMonthlyBudget((prev) => prev + amount);
+        newBudget.title = title;
         newBudget.amount = amount;
         setAllBudgets((prev) => [newBudget, ...prev]);
         await increaseBudget(newBudget);
     }
 
-    const decreaseMonthlyBudget = async (amount: number) => {
+    const decreaseMonthlyBudget = async (title: string, amount: number) => {
         setMonthlyBudget((prev) => prev - amount);
+        newBudget.title = title;
         newBudget.amount = 0 - amount;
         setAllBudgets((prev) => [newBudget, ...prev]);
         await decreaseBudget(newBudget);

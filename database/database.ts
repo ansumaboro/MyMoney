@@ -71,15 +71,15 @@ export async function getMonthlyBudget(createdDate: number) {
 }
 
 export async function increaseBudget(newBudget: Budget) {
-    const {id, amount, createdAt} = newBudget;
+    const {id,title, amount, createdAt} = newBudget;
     const db = await dbConnection;
-    await db.runAsync(`INSERT INTO budgets (id, amount, createdAt) VALUES (?, ?, ?)`, [id, amount, createdAt]);
+    await db.runAsync(`INSERT INTO budgets (id, title, amount, createdAt) VALUES (?, ?, ?, ?)`, [id, title, amount, createdAt]);
 }
 
 export async function decreaseBudget(newBudget: Budget) {
-    const {id, amount, createdAt} = newBudget;
+    const {id,title, amount, createdAt} = newBudget;
     const db = await dbConnection;
-    await db.runAsync(`INSERT INTO budgets (id, amount, createdAt) VALUES (?, ?, ?)`, [id, amount, createdAt]);
+    await db.runAsync(`INSERT INTO budgets (id, title, amount, createdAt) VALUES (?, ?, ?, ?)`, [id, title, amount, createdAt]);
 }
 
 export async function removeBudgetEntryDb(id:number) {
