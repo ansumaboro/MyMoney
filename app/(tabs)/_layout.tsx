@@ -9,7 +9,6 @@ const TabIcon = ({ focused, title, icon }: any) => {
             style={
                 {
                     borderRadius: 50,
-                    // marginTop: 21,
                     overflow: 'hidden',
                     height: 60,
                     width: 180,
@@ -38,7 +37,6 @@ const TabIcon = ({ focused, title, icon }: any) => {
 
 export default function Tablayout() {
     const insets = useSafeAreaInsets();
-
     return (
         <Tabs
             screenOptions={{
@@ -52,7 +50,7 @@ export default function Tablayout() {
                     marginBottom: insets.bottom,
                     borderRadius: 50,
                     flexDirection: "row",
-                    marginTop: 0,
+                    marginTop: insets.bottom * (-1),
                 },
                 tabBarHideOnKeyboard: true,
             }}>

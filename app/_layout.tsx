@@ -14,15 +14,15 @@ export default function RootLayout() {
     }, []);
 
     return (
-        <BudgetProvider>
-            <TransactionProvider>
-                <SafeAreaProvider>
+        <SafeAreaProvider>
+            <BudgetProvider>
+                <TransactionProvider>
                     <Stack screenOptions={{ headerShown: false }}>
                         <Stack.Screen name="(tabs)" />
                         <Stack.Screen name="budgetHistory" />
                     </Stack>
-                </SafeAreaProvider>
-            </TransactionProvider>
-        </BudgetProvider>
+                </TransactionProvider>
+            </BudgetProvider>
+        </SafeAreaProvider>
     );
 }

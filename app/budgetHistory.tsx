@@ -1,11 +1,12 @@
 import { Text, View, StyleSheet, Pressable, Alert, KeyboardAvoidingView, Platform, SectionList, Modal, TextInput } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { useBudget } from "../context/BudgetContext";
 import { Budget } from "../types/budget";
 
 export default function Budgets() {
-    const { monthlyBudget, increaseMonthlyBudget, decreaseMonthlyBudget, loadAllBudget, budgetSection, removeBudgetEntry } = useBudget();
+    const insets = useSafeAreaInsets();
+    const { increaseMonthlyBudget, decreaseMonthlyBudget, loadAllBudget, budgetSection, removeBudgetEntry } = useBudget();
     const [modalVisible, setModalVisible] = useState(false);
     useEffect(() => {
         loadAllBudget();
@@ -56,7 +57,7 @@ export default function Budgets() {
         <SafeAreaView style={styles.safeArea}>
             <KeyboardAvoidingView
                 style={styles.container}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                // behavior={Platform.OS === "ios" ? "padding" : undefined}
             >
                 <Text style={styles.heading}>Budget History</Text>
                 <SectionList
@@ -81,7 +82,7 @@ export default function Budgets() {
                     )}
                     ListEmptyComponent={
                         <View>
-                            <Text style={styles.emptyText}>No transactions recorded.</Text>
+                            <Text style={styles.emptyText}>No budgets recorded.</Text>
                         </View>
                     }
                 />
@@ -103,47 +104,53 @@ export default function Budgets() {
                     animationType="slide"
                     transparent={true}
                     visible={modalVisible}
-                    onRequestClose={() => setModalVisible(false)} // Handles Android back button
+                    onRequestClose={() => setModalVisible(false)}
                 >
-                    <Pressable
-                        style={styles.overlay}
-                        onPress={() => setModalVisible(false)}
+                    <KeyboardAvoidingView
+                        style={{flex: 1}}
+                        behavior={Platform.OS === "ios"?"padding":"padding"}
+                        keyboardVerticalOffset={Platform.OS === "ios"?undefined:-insets.bottom}
                     >
-                        <Pressable style={styles.modalContainer} onPress={(e) => e.stopPropagation()}>
-                            <View>
-                                <Text style={styles.modalTitle}>{budgetType == "in" ? "Increase Budget" : "Decrease Budget"}</Text>
-                                <TextInput
-                                    value={title}
-                                    onChangeText={setTitle}
-                                    placeholder="Budget title"
-                                    placeholderTextColor={"gray"}
-                                    style={styles.input}
-                                />
-                                <TextInput
-                                    value={amount}
-                                    onChangeText={setAmount}
-                                    keyboardType="numeric"
-                                    placeholder="Amount"
-                                    placeholderTextColor={"gray"}
-                                    style={styles.input}
-                                />
-                                {budgetType === "in" ?
-                                    <Pressable
-                                        onPress={handleBudgetChange}
-                                        style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? "darkgreen" : "green" }]}
-                                    >
-                                        <Text style={styles.saveButtonText}>Save</Text>
-                                    </Pressable> :
-                                    <Pressable
-                                        onPress={handleBudgetChange}
-                                        style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? "#af1c1c" : "#dc2626" }]}
-                                    >
-                                        <Text style={styles.saveButtonText}>Save</Text>
-                                    </Pressable>
-                                }
-                            </View>
+                        <Pressable
+                            style={styles.overlay}
+                            onPress={() => setModalVisible(false)}
+                        >
+                            <Pressable style={[styles.modalContainer, { marginBottom: insets.bottom }]} onPress={(e) => e.stopPropagation()}>
+                                <View>
+                                    <Text style={styles.modalTitle}>{budgetType == "in" ? "Increase Budget" : "Decrease Budget"}</Text>
+                                    <TextInput
+                                        value={title}
+                                        onChangeText={setTitle}
+                                        placeholder="Budget title"
+                                        placeholderTextColor={"gray"}
+                                        style={styles.input}
+                                    />
+                                    <TextInput
+                                        value={amount}
+                                        onChangeText={setAmount}
+                                        keyboardType="numeric"
+                                        placeholder="Amount"
+                                        placeholderTextColor={"gray"}
+                                        style={styles.input}
+                                    />
+                                    {budgetType === "in" ?
+                                        <Pressable
+                                            onPress={handleBudgetChange}
+                                            style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? "darkgreen" : "green" }]}
+                                        >
+                                            <Text style={styles.saveButtonText}>Save</Text>
+                                        </Pressable> :
+                                        <Pressable
+                                            onPress={handleBudgetChange}
+                                            style={({ pressed }) => [styles.saveButton, { backgroundColor: pressed ? "#af1c1c" : "#dc2626" }]}
+                                        >
+                                            <Text style={styles.saveButtonText}>Save</Text>
+                                        </Pressable>
+                                    }
+                                </View>
+                            </Pressable>
                         </Pressable>
-                    </Pressable>
+                    </KeyboardAvoidingView>
                 </Modal>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -373,7 +380,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-around",
         gap: 30,
-        paddingHorizontal: 12
+        paddingHorizontal: 12,
+        marginBottom: 8,
     },
     updateButton: {
         flex: 1,
@@ -398,7 +406,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 12,
         padding: 24,
-        // alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,

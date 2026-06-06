@@ -9,6 +9,7 @@ export async function initializeDatabase() {
     await db.execAsync(`
     CREATE TABLE IF NOT EXISTS budgets (
       id INTEGER PRIMARY KEY NOT NULL,
+      title TEXT NOT NULL,
       amount REAL NOT NULL,
       createdAt INTEGER NOT NULL
     );
