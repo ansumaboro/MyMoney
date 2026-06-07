@@ -6,26 +6,29 @@ A modern offline-first personal finance and expense tracking mobile application 
 
 ## Features
 
-* Add and manage daily transactions
-* Monthly budget tracking
+* View all transactions month-wise
+* Add and delete transactions
+* Monthly budget tracking with remaining balance calculation
+* Add and delete new budget entries
+* View all budget entries month-wise
 * Category-based expense organization
-* Offline-first local storage using SQLite
-* Persistent transaction history
-* Bottom tab navigation using Expo Router
-* Real-time expense updates using Context API
+* Real-time updates using React Context API
+* Fully offline-first experience using SQLite
+* Persistent transaction history storage
+* Clean tab-based navigation using Expo Router
 * Responsive and modern mobile UI
 
 ---
 
 # Highlights
 
-* Built using React Native, Expo Router, and TypeScript
-* Implemented offline-first architecture using SQLite
-* Designed scalable state management using React Context API
-* Integrated persistent local storage for transactions and budgets
-* Developed modular tab-based navigation architecture
-* Managed asynchronous database operations without blocking UI
-* Structured project using reusable components and modular folders
+* Built with React Native, Expo, and TypeScript
+* Offline-first architecture using SQLite (expo-sqlite)
+* Global state management using Context API
+* Modular and reusable component-based structure
+* Scalable navigation system using Expo Router Tabs
+* Asynchronous database operations without UI blocking
+* Clean separation of UI, state, navigation, and persistence layers
 
 ---
 
@@ -40,15 +43,11 @@ A modern offline-first personal finance and expense tracking mobile application 
 
 ## Database
 
-* Expo SQLite
+* Expo SQLite (local offline storage)
 
 ## State Management
 
 * React Context API
-
-## Navigation
-
-* Expo Router Tabs
 
 ---
 
@@ -66,6 +65,11 @@ A modern offline-first personal finance and expense tracking mobile application 
       <br />
       Transactions
     </td>
+    <td align="center">
+      <img src="./assets/screenshots/budgets.jpeg" width="220"/>
+      <br />
+      Budgets
+    </td>
   </tr>
 </table>
 
@@ -76,13 +80,13 @@ A modern offline-first personal finance and expense tracking mobile application 
 The application follows a modular and scalable architecture.
 
 ```txt
-UI Layer
-   ↓
-Expo Router Navigation Layer
-   ↓
-React Context State Layer
-   ↓
-SQLite Persistence Layer
+UI Layer (React Native Screens & Components)
+        ↓
+Navigation Layer (Expo Router Tabs)
+        ↓
+State Management Layer (React Context API)
+        ↓
+Persistence Layer (SQLite Database)
 ```
 
 ### Architecture Overview
@@ -90,7 +94,7 @@ SQLite Persistence Layer
 * **UI Layer** → React Native components and screens
 * **Navigation Layer** → Expo Router tab-based navigation
 * **State Layer** → Shared global state using Context API
-* **Persistence Layer** → SQLite database for offline storage
+* **Persistence Layer** → Local offline storage using SQLite
 
 ---
 
@@ -105,7 +109,8 @@ MyMoney/
 │   │   ├── index.tsx
 │   │   └── transactions.tsx
 │   │
-│   └── _layout.tsx
+│   ├── _layout.tsx
+│   └── budgetHistory.tsx
 │
 ├── components/
 │   ├── TransactionCard.tsx
@@ -156,6 +161,7 @@ The application uses Expo SQLite for persistent offline data storage.
 | Column    | Type    |
 | --------- | ------- |
 | id        | INTEGER |
+| title     | TEXT    |
 | amount    | REAL    |
 | createdAt | INTEGER |
 
@@ -167,13 +173,15 @@ The application uses Expo SQLite for persistent offline data storage.
 
 * Add new transactions
 * Delete existing transactions
-* Retrieve all transaction history
-* Persistent local data storage
+* View complete transaction history
+* Persist data locally using SQLite
 
 ---
 
 ## Budget Tracking
-
+* Add new budget records
+* Delete existing records
+* View all budget records
 * Monthly budget calculation
 * Remaining balance calculation
 * Category-wise expense tracking
@@ -208,20 +216,26 @@ The application uses Expo Router with tab-based navigation.
 
 Future improvements planned for the application:
 
-* Cloud synchronization
-* Authentication system
+## Cloud & Sync
+* Cloud backup and synchronization
+* Multi-device support
+## Authentication
+* User login and secure data storage
+## Analytics
 * AI-powered expense insights
-* Expense analytics dashboard
-* PDF report export
-* Push notifications and reminders
+* Advanced spending dashboards
+## Export & Reports
+* PDF report generation
+* Monthly financial summaries
+## UI Enhancements
 * Dark mode support
-* Multi-device synchronization
+* Push notifications and reminders
 
 ---
 
 # Demo
 
-APK Download: https://tinyurl.com/bdewwr36
+APK Download (Android): https://tinyurl.com/b8c24phk
 
 ---
 
